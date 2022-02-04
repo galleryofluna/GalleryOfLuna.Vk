@@ -7,6 +7,10 @@ namespace GalleryOfLuna.Vk.Publishing.EntityFramework
     {
         public DbSet<PublishedImage> PublishedImages { get; set; } = null!;
 
+        public PublishingDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

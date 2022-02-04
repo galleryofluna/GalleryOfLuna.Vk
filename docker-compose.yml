@@ -3,14 +3,20 @@ version: '3.4'
 services:
   service:
     image: galleryofluna-vk
+    depends_on: 
+      - derpibooru
     build:
       context: ./src/GalleryOfLuna.Vk
       dockerfile: Dockerfile
+    env_file: 
+      - .env
+    environment:
+      - Derpibooru__ConnectionString=Server=derpibooru;Port=5433;Database=derpibooru;User Id=postgres;Password=${POSTGRES_PASSWORD};
 
-  dump:
+  derpibooru:
     image: pg-derpibooru-dump
     build:
       context: ./tools/pg-derpibooru-dump
       dockerfile: Dockerfile
-    environment:
-      - POSTGRES_PASSWORD=Pass123$$
+    env_file: 
+      - .env

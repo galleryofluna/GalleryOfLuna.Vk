@@ -12,6 +12,8 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="6.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
@@ -19,6 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GalleryOfLuna.Vk.Derpibooru.EntityFramework\GalleryOfLuna.Vk.Derpibooru.EntityFramework.csproj" />
+      <ProjectReference Include="..\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite.csproj" />
       <ProjectReference Include="..\GalleryOfLuna.Vk.Publishing.EntityFramework\GalleryOfLuna.Vk.Publishing.EntityFramework.csproj" />
     </ItemGroup>
 </Project>

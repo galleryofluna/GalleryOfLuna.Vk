@@ -6,6 +6,7 @@
     <ProjectGuid>7f3f6f39-f74d-4278-8eff-16db7ca81b4a</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
+    <None Include=".env" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
