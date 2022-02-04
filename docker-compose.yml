@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  service:
+    image: galleryofluna-vk
+    build:
+      context: ./src/GalleryOfLuna.Vk
+      dockerfile: Dockerfile
+
+  dump:
+    image: pg-derpibooru-dump
+    build:
+      context: ./tools/pg-derpibooru-dump
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=Pass123$$
