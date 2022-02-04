@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalleryOfLuna.Vk.Publishing
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite", "src\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite.csproj", "{6A39A20D-75CC-48F5-8E78-2E309C8F1953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryOfLuna.Vk.Dump.EntityFramework", "src\GalleryOfLuna.Vk.Dump.EntityFramework\GalleryOfLuna.Vk.Dump.EntityFramework.csproj", "{0C10BF2E-857F-416C-8FEC-BA925A186B9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryOfLuna.Vk.Derpibooru.EntityFramework", "src\GalleryOfLuna.Vk.Derpibooru.EntityFramework\GalleryOfLuna.Vk.Derpibooru.EntityFramework.csproj", "{A5FDEE6A-E841-4796-8FA4-73397FEA6E5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,10 +44,10 @@ Global
 		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5FDEE6A-E841-4796-8FA4-73397FEA6E5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5FDEE6A-E841-4796-8FA4-73397FEA6E5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5FDEE6A-E841-4796-8FA4-73397FEA6E5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5FDEE6A-E841-4796-8FA4-73397FEA6E5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
