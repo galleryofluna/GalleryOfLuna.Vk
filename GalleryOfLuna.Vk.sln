@@ -16,6 +16,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pg-derpibooru-dump", "pg-de
 		tools\pg-derpibooru-dump\restore.sh = tools\pg-derpibooru-dump\restore.sh
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalleryOfLuna.Vk.Publishing.EntityFramework", "src\GalleryOfLuna.Vk.Publishing.EntityFramework\GalleryOfLuna.Vk.Publishing.EntityFramework.csproj", "{2D97E478-BC3A-4ABD-AF4C-9F4D95A9E53A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite", "src\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite.csproj", "{6A39A20D-75CC-48F5-8E78-2E309C8F1953}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryOfLuna.Vk.Dump.EntityFramework", "src\GalleryOfLuna.Vk.Dump.EntityFramework\GalleryOfLuna.Vk.Dump.EntityFramework.csproj", "{0C10BF2E-857F-416C-8FEC-BA925A186B9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +36,18 @@ Global
 		{7F3F6F39-F74D-4278-8EFF-16DB7CA81B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F3F6F39-F74D-4278-8EFF-16DB7CA81B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F3F6F39-F74D-4278-8EFF-16DB7CA81B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D97E478-BC3A-4ABD-AF4C-9F4D95A9E53A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D97E478-BC3A-4ABD-AF4C-9F4D95A9E53A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D97E478-BC3A-4ABD-AF4C-9F4D95A9E53A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D97E478-BC3A-4ABD-AF4C-9F4D95A9E53A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A39A20D-75CC-48F5-8E78-2E309C8F1953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C10BF2E-857F-416C-8FEC-BA925A186B9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
