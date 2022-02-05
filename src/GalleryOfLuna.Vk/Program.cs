@@ -74,7 +74,7 @@ namespace GalleryOfLuna.Vk
                 dbConfiguration.ConnectionString,
                 dbConfiguration.Type == DatabaseTypes.Default ? DatabaseTypes.SQLite : dbConfiguration.Type,
                 dbConfiguration.MaximumConnections);
-
+            
             dbConfiguration = Configuration.GetSection(Sections.Derpibooru).Get<DatabaseConfiguration>();
             services.AddDbContextPool<DerpibooruDbContext, DerpibooruDbContext>(
                 dbConfiguration.ConnectionString,

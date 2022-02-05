@@ -11,7 +11,7 @@ services:
     env_file: 
       - .env
     environment:
-      - Derpibooru__ConnectionString=Server=derpibooru;Port=5433;Database=derpibooru;User Id=postgres;Password=${POSTGRES_PASSWORD};
+      - Derpibooru__ConnectionString=Server=derpibooru;Database=derpibooru;User Id=postgres;Password=${POSTGRES_PASSWORD};
 
   derpibooru:
     image: pg-derpibooru-dump

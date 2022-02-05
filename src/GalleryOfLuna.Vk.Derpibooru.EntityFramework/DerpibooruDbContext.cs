@@ -8,10 +8,6 @@ namespace GalleryOfLuna.Vk.Derpibooru.EntityFramework
 {
     public partial class DerpibooruDbContext : DbContext
     {
-        public DerpibooruDbContext()
-        {
-        }
-
         public DerpibooruDbContext(DbContextOptions<DerpibooruDbContext> options)
             : base(options)
         {
@@ -501,7 +497,7 @@ namespace GalleryOfLuna.Vk.Derpibooru.EntityFramework
 
             modelBuilder.Entity<ImageTagging>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(d => new { d.ImageId, d.TagId });
 
                 entity.ToTable("image_taggings");
 
@@ -515,13 +511,13 @@ namespace GalleryOfLuna.Vk.Derpibooru.EntityFramework
                 entity.Property(e => e.TagId).HasColumnName("tag_id");
 
                 entity.HasOne(d => d.Image)
-                    .WithMany()
+                    .WithMany(d => d.ImageTaggings)
                     .HasForeignKey(d => d.ImageId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_image_taggings_images");
 
                 entity.HasOne(d => d.Tag)
-                    .WithMany()
+                    .WithMany(d=> d.ImageTaggings)
                     .HasForeignKey(d => d.TagId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_image_taggings_tags");

@@ -21,5 +21,6 @@ namespace GalleryOfLuna.Vk.Derpibooru.EntityFramework.Model
 
         public virtual ICollection<ArtistLink> ArtistLinks { get; set; }
         public virtual ICollection<TagChange> TagChanges { get; set; }
+        public virtual ICollection<ImageTagging> ImageTaggings { get; set; }
     }
 }
