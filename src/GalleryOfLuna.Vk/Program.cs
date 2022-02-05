@@ -81,6 +81,10 @@ namespace GalleryOfLuna.Vk
                 DatabaseTypes.PostgreSQL,
                 dbConfiguration.MaximumConnections);
 
+            services.AddHealthChecks()
+                .AddDbContextCheck<DerpibooruDbContext>()
+                .AddDbContextCheck<PublishingDbContext>();
+
             services.AddHostedService<Worker>();
         }
     }
