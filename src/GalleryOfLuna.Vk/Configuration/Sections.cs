@@ -10,5 +10,6 @@ namespace GalleryOfLuna.Vk.Configuration
     {
         public const string Database = "Database";
         public const string Derpibooru = "Derpibooru";
+        public const string Targets = "Targets";
     }
 }

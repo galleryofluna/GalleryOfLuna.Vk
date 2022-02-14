@@ -1,8 +1,12 @@
+using FluentValidation;
+
 using GalleryOfLuna.Vk.Configuration;
 using GalleryOfLuna.Vk.Derpibooru.EntityFramework;
 using GalleryOfLuna.Vk.EntityFramework.Sqlite;
 using GalleryOfLuna.Vk.Extensions;
 using GalleryOfLuna.Vk.Publishing.EntityFramework;
+
+using IL.FluentValidation.Extensions.Options;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +48,7 @@ namespace GalleryOfLuna.Vk
             {
                 await host.MigrateDatabaseAsync<PublishingDbContext>();
                 await host.RunAsync();
+                    
                 return 0;
             }
             catch (Exception ex)
@@ -59,15 +64,22 @@ namespace GalleryOfLuna.Vk
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            // Useless registration
-            services.AddOptions<DatabaseConfiguration>(Sections.Database)
-                .Bind(Configuration.GetSection(Sections.Database))
-                .ValidateDataAnnotations();
+            services.AddTransient<IValidator<TargetsConfiguration>, TargetsConfiguration.Validator>();
 
-            // Useless registration
+            services.AddOptions<DatabaseConfiguration>(Sections.Database)
+                .BindConfiguration(Sections.Database)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             services.AddOptions<DatabaseConfiguration>(Sections.Derpibooru)
-                .Bind(Configuration.GetSection(Sections.Derpibooru))
-                .ValidateDataAnnotations();
+                .BindConfiguration(Sections.Derpibooru)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            services.AddOptions<TargetsConfiguration>(Sections.Targets)
+                .BindConfiguration(Sections.Targets)
+                .ValidateWithFluentValidator()
+                .ValidateOnStart();
 
             var dbConfiguration = Configuration.GetSection(Sections.Database).Get<DatabaseConfiguration>();
             services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
