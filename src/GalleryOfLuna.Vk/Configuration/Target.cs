@@ -2,15 +2,9 @@
 
 using FluentValidation;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace GalleryOfLuna.Vk.Configuration
 {
-    public class Target
+    public record Target
     {
         public string? Name { get; set; }
 
@@ -30,7 +24,7 @@ namespace GalleryOfLuna.Vk.Configuration
                     {
                         try
                         {
-                            CronExpression.Parse(cronExpression);
+                            CronExpression.Parse(cronExpression, CronFormat.IncludeSeconds);
                         }
                         catch (CronFormatException exception)
                         {

@@ -76,7 +76,7 @@ namespace GalleryOfLuna.Vk
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            services.AddOptions<TargetsConfiguration>(Sections.Targets)
+            services.AddOptions<TargetsConfiguration>()
                 .BindConfiguration(Sections.Targets)
                 .ValidateWithFluentValidator()
                 .ValidateOnStart();
@@ -97,7 +97,7 @@ namespace GalleryOfLuna.Vk
                 .AddDbContextCheck<DerpibooruDbContext>()
                 .AddDbContextCheck<PublishingDbContext>();
 
-            services.AddHostedService<Worker>();
+            services.AddHostedService<Scheduler>();
         }
     }
 }
