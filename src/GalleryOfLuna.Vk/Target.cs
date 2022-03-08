@@ -1,29 +1,49 @@
 ﻿using Cronos;
 
 using System;
+using System.Collections.Generic;
 
 namespace GalleryOfLuna.Vk
 {
     public class Target : IEquatable<Target>
     {
-        public string Name { get; }
-        public string Description { get; }
-        public string Query { get; }
+        public string Name { get; init; } = string.Empty;
+
+        public string Description { get; init; } = string.Empty;
+
+        public int Threshold { get; set; } = 0;
+
+        public IEnumerable<string> Tags { get; init; } = Array.Empty<string>();
+
+        public IEnumerable<string> ExcludedTags { get; init; } = Array.Empty<string>();
+
+        public DateTime? Until { get; init; }
+
+        public DateTime? After { get; init; }
+
         public CronExpression Schedule { get; }
 
-        public Target(string query, CronExpression schedule, string? name = "", string? description = "")
+        public Target(CronExpression schedule)
         {
-            Query = query;
             Schedule = schedule;
-            Name = name ?? string.Empty;
-            Description = description ?? string.Empty;
         }
 
         public static Target From(Configuration.Target configTarget)
         {
             var schedule = CronExpression.Parse(configTarget.Schedule, CronFormat.IncludeSeconds);
 
-            var target = new Target(configTarget.Query, schedule, configTarget.Name, configTarget.Description);
+            var target = new Target(schedule)
+            {
+                Name = configTarget.Name ?? string.Empty,
+                Description = configTarget.Description ?? string.Empty,
+
+                Threshold = configTarget.Threshold ?? 0,
+              
+                Tags = configTarget.Tags ?? Array.Empty<string>(),
+                ExcludedTags = configTarget.ExcludedTags ?? Array.Empty<string>(),
+                After = configTarget.After,
+                Until = configTarget.Until,
+            };
 
             return target;
         }
@@ -33,33 +53,49 @@ namespace GalleryOfLuna.Vk
                 Name = Name,
                 Description = Description,
                 Schedule = Schedule.ToString(),
-                Query = Query
+
+                Threshold = Threshold,
+
+                Tags = Tags,
+                ExcludedTags = ExcludedTags,
+                After = After,
+                Until = After
             };
 
         public bool Equals(Target? other)
         {
             if (ReferenceEquals(null, other))
                 return false;
+
             if (ReferenceEquals(this, other))
                 return true;
-            return Name == other.Name && Description == other.Description && Query == other.Query && Schedule.Equals(other.Schedule);
+
+            return Name == other.Name
+                   && Description == other.Description
+                   && Equals(Tags, other.Tags)
+                   && Equals(ExcludedTags, other.ExcludedTags)
+                   && Nullable.Equals(Until, other.Until)
+                   && Nullable.Equals(After, other.After)
+                   && Schedule.Equals(other.Schedule);
         }
 
-        public override bool Equals(
-            object? obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
                 return false;
+
             if (ReferenceEquals(this, obj))
                 return true;
-            if (obj.GetType() != this.GetType())
+
+            if (obj.GetType() != GetType())
                 return false;
+
             return Equals((Target)obj);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, Description, Query, Schedule);
+            return HashCode.Combine(Name, Description, Tags, ExcludedTags, Until, After, Schedule);
         }
     }
 }
