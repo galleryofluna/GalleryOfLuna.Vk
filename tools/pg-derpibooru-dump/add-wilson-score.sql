@@ -1,5 +1,5 @@
 ALTER TABLE images
-	ADD COLUMN wilson_score NUMERIC;
+	ADD COLUMN wilson_score NUMERIC(16,15);
 	
 CREATE INDEX images_IX_wilson_score ON images (wilson_score);
 
