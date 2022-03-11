@@ -3,20 +3,27 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>false</ImplicitUsings>
-        <UserSecretsId>dotnet-GalleryOfLuna.Vk-EFA09D7A-B4D0-47D4-852A-42F9D04F3B2F</UserSecretsId>
+        <ImplicitUsings>true</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..</DockerfileContext>
+        <UserSecretsId>92be9e1a-06bb-4302-ae1d-cd3c1d64b2ae</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Cronos" Version="0.7.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.3.6" />
         <PackageReference Include="IL.FluentValidation.Extensions.Options" Version="10.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="6.2.17" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="6.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
