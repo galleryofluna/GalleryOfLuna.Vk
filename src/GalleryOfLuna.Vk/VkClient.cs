@@ -18,7 +18,7 @@ namespace GalleryOfLuna.Vk
 
         private readonly HttpClient _httpClient;
         private readonly VkConfiguration _configuration;
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions();
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new();
 
         public VkClient(HttpClient httpClient, IOptions<VkConfiguration> configuration)
         {
@@ -43,7 +43,9 @@ namespace GalleryOfLuna.Vk
             _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public async Task<GetWallUploadServerResponse> GetWallUploadServerAsync(long groupId, CancellationToken cancellationToken = default)
+        public async Task<GetWallUploadServerResponse> GetWallUploadServerAsync(
+            long groupId,
+            CancellationToken cancellationToken = default)
         {
             var queryBuilder = new QueryBuilder()
                 .Add(QueryParameters.AccessToken, _configuration.AccessToken)
@@ -60,7 +62,12 @@ namespace GalleryOfLuna.Vk
                 cancellationToken);
         }
 
-        public async Task<IEnumerable<PhotoResponse>> SaveWallPhotoAsync(long groupId, string photo, long server, string hash, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<PhotoResponse>> SaveWallPhotoAsync(
+            long groupId,
+            string photo,
+            long server,
+            string hash,
+            CancellationToken cancellationToken = default)
         {
             var queryBuilder = new QueryBuilder()
                 .Add(QueryParameters.AccessToken, _configuration.AccessToken)
@@ -82,7 +89,12 @@ namespace GalleryOfLuna.Vk
             return result.Response;
         }
 
-        public async Task Post(long ownerId, string message, string attachments, string copyright, CancellationToken cancellationToken = default)
+        public async Task Post(
+            long ownerId,
+            string message,
+            string attachments,
+            string copyright,
+            CancellationToken cancellationToken = default)
         {
             var queryBuilder = new QueryBuilder()
                 .Add(QueryParameters.AccessToken, _configuration.AccessToken)
@@ -103,14 +115,21 @@ namespace GalleryOfLuna.Vk
                 cancellationToken);
         }
 
-        public async Task<UploadPhotoResponse> UploadPhotoAsync(string uploadUrl,string imageFormat, Stream fileStream, CancellationToken cancellationToken = default)
+        public async Task<UploadPhotoResponse> UploadPhotoAsync(
+            string uploadUrl,
+            string imageFormat,
+            Stream fileStream,
+            CancellationToken cancellationToken = default)
         {
             var content = GetUploadContent("photo", imageFormat, fileStream);
 
             return await SendRequestAsync<UploadPhotoResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
         }
 
-        private MultipartFormDataContent GetUploadContent(string fieldName, string imageFormat, params Stream[] fileStreams)
+        private MultipartFormDataContent GetUploadContent(
+            string fieldName,
+            string imageFormat,
+            params Stream[] fileStreams)
         {
             var formData = new MultipartFormDataContent();
             for (var i = 1; i <= fileStreams.Length; i++)
@@ -130,8 +149,13 @@ namespace GalleryOfLuna.Vk
             HttpMethod httpMethod,
             CancellationToken cancellationToken = default) =>
             SendRequestAsync<T>(requestUri, httpMethod, null, cancellationToken);
+        
 
-        private async Task<T> SendRequestAsync<T>(string requestUri, HttpMethod httpMethod, HttpContent? httpContent = null, CancellationToken cancellationToken = default)
+        private async Task<T> SendRequestAsync<T>(
+            string requestUri,
+            HttpMethod httpMethod,
+            HttpContent? httpContent = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(httpMethod, requestUri);
             request.Content = httpContent;

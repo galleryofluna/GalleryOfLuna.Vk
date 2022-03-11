@@ -5,15 +5,9 @@ using GalleryOfLuna.Vk.Publishing.EntityFramework;
 using GalleryOfLuna.Vk.Publishing.EntityFramework.Model;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using System;
 using System.Data;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GalleryOfLuna.Vk
 {
@@ -47,10 +41,12 @@ namespace GalleryOfLuna.Vk
 
         public async Task Execute(CancellationToken cancellationToken)
         {
-            await using var transaction = await _publishingDbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            await using var transaction = await _publishingDbContext.Database.BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
 
             var image = await FindImageAsync(cancellationToken);
-            
+
             await using var imageStream = await OpenStreamAsync(image);
 
             await PublishImageAsync(image, imageStream, cancellationToken);
@@ -74,14 +70,14 @@ namespace GalleryOfLuna.Vk
             var includedTagIds = _target.Tags.Select(tag => tagIds[tag]).ToArray();
             var excludedTagIds = _target.ExcludedTags.Select(tag => tagIds[tag]).ToArray();
 
-            IQueryable<Image> query = _derpibooru.Images
+            var query = _derpibooru.Images
                 .AsNoTracking()
                 .Include(d => d.User)
                 .Include(d => d.ImageTaggings)
                 .ThenInclude(d => d.Tag)
                 .OrderByDescending(d => d.WilsonScore)
                 .Where(image => !publishedIds.Contains(image.Id))
-                .Where(image => image.Score > _target.Threshold) 
+                .Where(image => image.Score > _target.Threshold)
                 // TODO: Support animated formats
                 .Where(image => image.ImageFormat != "webm")
                 .Where(image => image.ImageFormat != "gif");
@@ -93,12 +89,16 @@ namespace GalleryOfLuna.Vk
                 query = query.Where(image => image.CreatedAt > _target.After.Value);
 
             if (includedTagIds.Any())
+            {
                 foreach (var includedTagId in includedTagIds)
                     query = query.Where(image => image.ImageTaggings.Select(x => x.TagId).Contains(includedTagId));
+            }
 
             if (excludedTagIds.Any())
+            {
                 foreach (var excludedTagId in excludedTagIds)
                     query = query.Where(image => !image.ImageTaggings.Select(x => x.TagId).Contains(excludedTagId));
+            }
 
             var image = await query.FirstAsync(cancellationToken);
 
@@ -158,9 +158,11 @@ namespace GalleryOfLuna.Vk
                 cancellationToken);
         }
 
-        private async Task<PublishedImage> MarkImageAsPublished(Image image, CancellationToken cancellationToken = default)
+        private async Task<PublishedImage> MarkImageAsPublished(
+            Image image,
+            CancellationToken cancellationToken = default)
         {
-            var publishedImage= new PublishedImage(DateTime.UtcNow, "Derpibooru", image.Id.ToString());
+            var publishedImage = new PublishedImage(DateTime.UtcNow, "Derpibooru", image.Id.ToString());
             _publishingDbContext.PublishedImages.Add(publishedImage);
             await _publishingDbContext.SaveChangesAsync(cancellationToken);
 
@@ -179,7 +181,7 @@ namespace GalleryOfLuna.Vk
             }
         }
 
-        private string GetMessage(Image image) =>
+        private string GetMessage(Image image) => 
 @$"Автор {image.User?.Name ?? "Background Pony"}
 
 Рейтинг: {image.Score}

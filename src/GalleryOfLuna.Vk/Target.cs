@@ -1,8 +1,5 @@
 ﻿using Cronos;
 
-using System;
-using System.Collections.Generic;
-
 namespace GalleryOfLuna.Vk
 {
     public class Target : IEquatable<Target>
@@ -11,7 +8,7 @@ namespace GalleryOfLuna.Vk
 
         public string Description { get; init; } = string.Empty;
 
-        public int Threshold { get; set; } = 0;
+        public int Threshold { get; set; }
 
         public IEnumerable<string> Tags { get; init; } = Array.Empty<string>();
 
@@ -38,29 +35,29 @@ namespace GalleryOfLuna.Vk
                 Description = configTarget.Description ?? string.Empty,
 
                 Threshold = configTarget.Threshold ?? 0,
-              
+
                 Tags = configTarget.Tags ?? Array.Empty<string>(),
                 ExcludedTags = configTarget.ExcludedTags ?? Array.Empty<string>(),
                 After = configTarget.After,
-                Until = configTarget.Until,
+                Until = configTarget.Until
             };
 
             return target;
         }
 
-        public Configuration.Target ToConfiguration() => new() 
-            {
-                Name = Name,
-                Description = Description,
-                Schedule = Schedule.ToString(),
+        public Configuration.Target ToConfiguration() => new()
+        {
+            Name = Name,
+            Description = Description,
+            Schedule = Schedule.ToString(),
 
-                Threshold = Threshold,
+            Threshold = Threshold,
 
-                Tags = Tags,
-                ExcludedTags = ExcludedTags,
-                After = After,
-                Until = After
-            };
+            Tags = Tags,
+            ExcludedTags = ExcludedTags,
+            After = After,
+            Until = After
+        };
 
         public bool Equals(Target? other)
         {
@@ -93,9 +90,7 @@ namespace GalleryOfLuna.Vk
             return Equals((Target)obj);
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Description, Tags, ExcludedTags, Until, After, Schedule);
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(Name, Description, Tags, ExcludedTags, Until, After, Schedule);
     }
 }

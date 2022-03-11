@@ -3,10 +3,8 @@ using System.Text.Json;
 
 public class SnakeCaseNamingPolicy : JsonNamingPolicy
 {
-    public override string ConvertName(string name)
-    {
-        return ToSnakeCase(name);
-    }
+    public override string ConvertName(string name) =>
+        ToSnakeCase(name);
 
     private string ToSnakeCase(string text)
     {
@@ -27,9 +25,7 @@ public class SnakeCaseNamingPolicy : JsonNamingPolicy
                 sb.Append(char.ToLowerInvariant(c));
             }
             else
-            {
                 sb.Append(c);
-            }
         }
 
         return sb.ToString();

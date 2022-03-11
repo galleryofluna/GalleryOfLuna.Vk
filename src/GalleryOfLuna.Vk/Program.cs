@@ -8,17 +8,9 @@ using GalleryOfLuna.Vk.Publishing.EntityFramework;
 
 using IL.FluentValidation.Extensions.Options;
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 using Serilog;
 
-using System;
-using System.IO;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GalleryOfLuna.Vk
 {
@@ -35,7 +27,7 @@ namespace GalleryOfLuna.Vk
             {
                 await host.MigrateDatabaseAsync<PublishingDbContext>();
                 await host.RunAsync();
-                    
+
                 return 0;
             }
             catch (Exception ex)
@@ -76,13 +68,13 @@ namespace GalleryOfLuna.Vk
                 .BindConfiguration(Sections.Targets)
                 .ValidateWithFluentValidator()
                 .ValidateOnStart();
-            
+
             var dbConfiguration = context.Configuration.GetSection(Sections.Database).Get<DatabaseConfiguration>();
             services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
                 dbConfiguration.ConnectionString,
                 dbConfiguration.Type == DatabaseTypes.Default ? DatabaseTypes.SQLite : dbConfiguration.Type,
                 dbConfiguration.MaximumConnections);
-            
+
             dbConfiguration = context.Configuration.GetSection(Sections.Derpibooru).Get<DatabaseConfiguration>();
             services.AddDbContextPool<DerpibooruDbContext, DerpibooruDbContext>(
                 dbConfiguration.ConnectionString,

@@ -1,8 +1,5 @@
 ﻿using FluentValidation;
 
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
 namespace GalleryOfLuna.Vk.Configuration
 {
     public class TargetsConfiguration : List<Target>

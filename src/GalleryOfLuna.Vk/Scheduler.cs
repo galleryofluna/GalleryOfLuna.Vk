@@ -1,20 +1,8 @@
-﻿using Cronos;
+﻿using GalleryOfLuna.Vk.Configuration;
 
-using GalleryOfLuna.Vk.Configuration;
-using GalleryOfLuna.Vk.Derpibooru.EntityFramework;
-
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 namespace GalleryOfLuna.Vk
@@ -27,7 +15,7 @@ namespace GalleryOfLuna.Vk
         private readonly ILogger<Scheduler> _logger;
 
         private readonly PriorityQueue<Target, DateTime> _queue = new();
-        private readonly SemaphoreSlim _queueMutex = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _queueMutex = new(1);
         private ActionBlock<JobInformation> _processing;
 
         public Scheduler(
@@ -72,7 +60,9 @@ namespace GalleryOfLuna.Vk
                         if (priority < DateTime.UtcNow)
                         {
                             _processing.Post(JobInformation.Create<PublishImageJob>(target));
-                            _queue.EnqueueDequeue(target, target.Schedule.GetNextOccurrence(DateTime.UtcNow) ?? DateTime.MaxValue);
+                            _queue.EnqueueDequeue(
+                                target,
+                                target.Schedule.GetNextOccurrence(DateTime.UtcNow) ?? DateTime.MaxValue);
                         }
                     }
 
@@ -88,7 +78,9 @@ namespace GalleryOfLuna.Vk
             await _processing.Completion;
         }
 
-        private async Task ReloadTargets(TargetsConfiguration configuration, CancellationToken cancellationToken = default)
+        private async Task ReloadTargets(
+            TargetsConfiguration configuration,
+            CancellationToken cancellationToken = default)
         {
             try
             {
@@ -110,7 +102,7 @@ namespace GalleryOfLuna.Vk
                 if (addedTargets.Any())
                     _logger.LogInformation("Next targets has been added to schedule: {items}", addedTargets);
 
-                if( removedTargets.Any())
+                if (removedTargets.Any())
                     _logger.LogInformation("Next targets has been excluded from schedule: {items}", removedTargets);
             }
             finally
@@ -126,8 +118,11 @@ namespace GalleryOfLuna.Vk
             new(async jobInfo =>
                 {
                     await using var scope = _serviceProvider.CreateAsyncScope();
-                    var job = ActivatorUtilities.CreateInstance(scope.ServiceProvider, jobInfo.JobType, jobInfo.Parameters) as IJob 
-                        ?? throw new InvalidOperationException("Created job instance is null");
+                    var job = ActivatorUtilities.CreateInstance(
+                                  scope.ServiceProvider,
+                                  jobInfo.JobType,
+                                  jobInfo.Parameters) as IJob
+                              ?? throw new InvalidOperationException("Created job instance is null");
                     _logger.LogInformation("Job {jobType} starts execution", jobInfo.JobType.Name);
                     await job.Execute(stoppingToken)
                         .ContinueWith(LogJobCompletion(jobInfo), stoppingToken);
@@ -142,8 +137,10 @@ namespace GalleryOfLuna.Vk
         {
             if (task.IsCompletedSuccessfully)
                 _logger.LogInformation("Job {jobType} ended successfully", jobInfo.JobType.Name);
+
             if (task.IsFaulted)
                 _logger.LogError(task.Exception, "Job {jobType} ended with an exception", jobInfo.JobType.Name);
+
             if (task.IsCanceled)
                 _logger.LogWarning("Job {jobType} was cancelled", jobInfo.JobType.Name);
         };

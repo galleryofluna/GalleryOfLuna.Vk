@@ -40,10 +40,8 @@ internal class QueryBuilder : IEnumerable<KeyValuePair<string, string>>
     }
 
     public QueryBuilder Add<T>(string key, T value)
-        where T : IConvertible
-    {
-        return Add(key, value.ToString());
-    }
+        where T : IConvertible =>
+        Add(key, value.ToString());
 
     public QueryBuilder Add<T>(string key, IEnumerable<T> values)
         where T : IConvertible
@@ -99,25 +97,17 @@ internal class QueryBuilder : IEnumerable<KeyValuePair<string, string>>
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return ToString().GetHashCode();
-    }
+    public override int GetHashCode() =>
+        ToString().GetHashCode();
 
     /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        return ToString().Equals(obj);
-    }
+    public override bool Equals(object? obj) =>
+        ToString().Equals(obj);
 
     /// <inheritdoc />
-    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-    {
-        return _params.GetEnumerator();
-    }
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator() =>
+        _params.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return _params.GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() =>
+        _params.GetEnumerator();
 }

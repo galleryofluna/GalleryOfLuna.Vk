@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using GalleryOfLuna.Vk.Configuration;
+﻿using GalleryOfLuna.Vk.Configuration;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+
+using System.Reflection;
 
 namespace GalleryOfLuna.Vk.Extensions
 {
@@ -13,7 +10,9 @@ namespace GalleryOfLuna.Vk.Extensions
     {
         public static IServiceCollection AddDbContextPool<TContextService, TContextImplementation>(
             this IServiceCollection services,
-            string connectionString, DatabaseTypes databaseType, int poolSize)
+            string connectionString,
+            DatabaseTypes databaseType,
+            int poolSize)
             where TContextService : class
             where TContextImplementation : DbContext, TContextService
         {
@@ -22,33 +21,39 @@ namespace GalleryOfLuna.Vk.Extensions
             {
                 case DatabaseTypes.SQLite:
                     services.AddDbContextPool<TContextService, TContextImplementation>(options =>
-                    {
-                        options.UseSqlite(connectionString, sqliteOptions => sqliteOptions.MigrationsAssembly(migrationAssembly));
-                    }, poolSize);
+                        {
+                            options.UseSqlite(connectionString,
+                                sqliteOptions => sqliteOptions.MigrationsAssembly(migrationAssembly));
+                        },
+                        poolSize);
 
                     break;
 
 #if DEBUG
                 case DatabaseTypes.InMemory:
                     services.AddDbContextPool<TContextService, TContextImplementation>(options =>
-                    {
-                        options.UseInMemoryDatabase(typeof(TContextService).Name);
-                    }, poolSize);
+                        {
+                            options.UseInMemoryDatabase(typeof(TContextService).Name);
+                        },
+                        poolSize);
                     break;
 #endif
 
-                
+
                 case DatabaseTypes.PostgreSQL:
                     services.AddDbContextPool<TContextService, TContextImplementation>(options =>
-                    {
-                        
-                        options.UseNpgsql(connectionString, npsqlOptions => npsqlOptions.MigrationsAssembly(migrationAssembly));
-                    }, poolSize);
+                        {
+                            options.UseNpgsql(connectionString,
+                                npsqlOptions => npsqlOptions.MigrationsAssembly(migrationAssembly));
+                        },
+                        poolSize);
                     break;
 
                 case DatabaseTypes.Default:
                 default:
-                    throw new ArgumentException("Default RDBMS registration is not allowed. Please specify RDBMS type explicitly", nameof(databaseType));
+                    throw new ArgumentException(
+                        "Default RDBMS registration is not allowed. Please specify RDBMS type explicitly",
+                        nameof(databaseType));
             }
 
             return services;

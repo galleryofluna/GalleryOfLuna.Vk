@@ -2,9 +2,6 @@
 
 using FluentValidation;
 
-using System;
-using System.Collections.Generic;
-
 namespace GalleryOfLuna.Vk.Configuration
 {
     public record Target
@@ -16,7 +13,7 @@ namespace GalleryOfLuna.Vk.Configuration
         public int? Threshold { get; set; }
 
         public IEnumerable<string>? Tags { get; set; }
-        
+
         public IEnumerable<string>? ExcludedTags { get; set; }
 
         public DateTime? Until { get; set; }
@@ -39,7 +36,8 @@ namespace GalleryOfLuna.Vk.Configuration
                         }
                         catch (CronFormatException exception)
                         {
-                            context.AddFailure(nameof(Target.Schedule), $"Invalid cron expression was presented - '{cronExpression}'. {exception.Message}");
+                            context.AddFailure(nameof(Schedule),
+                                $"Invalid cron expression was presented - '{cronExpression}'. {exception.Message}");
                         }
                     });
             }

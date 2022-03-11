@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace GalleryOfLuna.Vk.Extensions
 {
@@ -18,8 +11,10 @@ namespace GalleryOfLuna.Vk.Extensions
             var context = scope.ServiceProvider.GetRequiredService<TDbContext>() as DbContext;
 
             if (context == null)
+            {
                 throw new ArgumentException(
                     $"Can't migrate {typeof(TDbContext).Name} service, because it's not a Entity Framework database context.");
+            }
 
             if (context.Database.IsInMemory())
                 return host;
