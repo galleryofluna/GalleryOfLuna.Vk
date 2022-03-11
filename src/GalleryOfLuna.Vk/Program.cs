@@ -16,29 +16,16 @@ using Serilog;
 
 using System;
 using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GalleryOfLuna.Vk
 {
     public static class Program
     {
-        private static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddCommandLine(Environment.GetCommandLineArgs())
-            .AddJsonFile("appsettings.json", false, true)
-            .AddJsonFile(
-                $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                true)
-            .AddEnvironmentVariables()
-            .Build();
-
         public static async Task<int> Main(string[] args)
         {
-            // Configuration can be specified by appsettings.json (https://github.com/serilog/serilog-settings-configuration)
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .CreateLogger();
-
             var host = Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .ConfigureServices(ConfigureServices)
@@ -62,8 +49,13 @@ namespace GalleryOfLuna.Vk
             }
         }
 
-        private static void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
+            // Configuration can be specified by appsettings.json (https://github.com/serilog/serilog-settings-configuration)
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(context.Configuration)
+                .CreateLogger();
+
             services.AddTransient<IValidator<TargetsConfiguration>, TargetsConfiguration.Validator>();
 
             services.AddOptions<DatabaseConfiguration>(Sections.Database)
@@ -76,18 +68,22 @@ namespace GalleryOfLuna.Vk
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
+            services.AddOptions<VkConfiguration>()
+                .BindConfiguration(Sections.Vk)
+                .ValidateOnStart();
+
             services.AddOptions<TargetsConfiguration>()
                 .BindConfiguration(Sections.Targets)
                 .ValidateWithFluentValidator()
                 .ValidateOnStart();
-
-            var dbConfiguration = Configuration.GetSection(Sections.Database).Get<DatabaseConfiguration>();
+            
+            var dbConfiguration = context.Configuration.GetSection(Sections.Database).Get<DatabaseConfiguration>();
             services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
                 dbConfiguration.ConnectionString,
                 dbConfiguration.Type == DatabaseTypes.Default ? DatabaseTypes.SQLite : dbConfiguration.Type,
                 dbConfiguration.MaximumConnections);
             
-            dbConfiguration = Configuration.GetSection(Sections.Derpibooru).Get<DatabaseConfiguration>();
+            dbConfiguration = context.Configuration.GetSection(Sections.Derpibooru).Get<DatabaseConfiguration>();
             services.AddDbContextPool<DerpibooruDbContext, DerpibooruDbContext>(
                 dbConfiguration.ConnectionString,
                 DatabaseTypes.PostgreSQL,
@@ -96,6 +92,13 @@ namespace GalleryOfLuna.Vk
             services.AddHealthChecks()
                 .AddDbContextCheck<DerpibooruDbContext>()
                 .AddDbContextCheck<PublishingDbContext>();
+
+            services.AddMemoryCache();
+            services.AddHttpClient();
+            services.AddScoped<VkClient>();
+
+            // Required for 'windows-1251' responses from VK API
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             services.AddHostedService<Scheduler>();
         }
