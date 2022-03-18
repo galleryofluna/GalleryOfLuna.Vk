@@ -5,6 +5,7 @@ using GalleryOfLuna.Vk.Derpibooru.EntityFramework;
 using GalleryOfLuna.Vk.EntityFramework.Sqlite;
 using GalleryOfLuna.Vk.Extensions;
 using GalleryOfLuna.Vk.Publishing.EntityFramework;
+using GalleryOfLuna.Vk.Publishing.EntityFramework.PostgreSQL;
 
 using IL.FluentValidation.Extensions.Options;
 
@@ -70,10 +71,27 @@ namespace GalleryOfLuna.Vk
                 .ValidateOnStart();
 
             var dbConfiguration = context.Configuration.GetSection(Sections.Database).Get<DatabaseConfiguration>();
-            services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
-                dbConfiguration.ConnectionString,
-                dbConfiguration.Type == DatabaseTypes.Default ? DatabaseTypes.SQLite : dbConfiguration.Type,
-                dbConfiguration.MaximumConnections);
+
+            switch (dbConfiguration.Type)
+            {
+                case DatabaseTypes.Default:
+                case DatabaseTypes.PostgreSQL:
+                    services.AddDbContextPool<PublishingDbContext, PostgreSqlPublishingDbContext>(
+                        dbConfiguration.ConnectionString,
+                        DatabaseTypes.PostgreSQL,
+                        dbConfiguration.MaximumConnections);
+                break;
+
+                case DatabaseTypes.SQLite:
+                    services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
+                        dbConfiguration.ConnectionString,
+                        DatabaseTypes.SQLite,
+                        dbConfiguration.MaximumConnections);
+                    break;
+
+                default:
+                    throw new NotSupportedException("Provided RDBMS type is not supported");
+            }
 
             dbConfiguration = context.Configuration.GetSection(Sections.Derpibooru).Get<DatabaseConfiguration>();
             services.AddDbContextPool<DerpibooruDbContext, DerpibooruDbContext>(

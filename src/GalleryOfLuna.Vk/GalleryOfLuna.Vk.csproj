@@ -34,6 +34,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GalleryOfLuna.Vk.Derpibooru.EntityFramework\GalleryOfLuna.Vk.Derpibooru.EntityFramework.csproj" />
+      <ProjectReference Include="..\GalleryOfLuna.Vk.Publishing.EntityFramework.PostgreSQL\GalleryOfLuna.Vk.Publishing.EntityFramework.PostgreSQL.csproj" />
       <ProjectReference Include="..\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite\GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite.csproj" />
       <ProjectReference Include="..\GalleryOfLuna.Vk.Publishing.EntityFramework\GalleryOfLuna.Vk.Publishing.EntityFramework.csproj" />
     </ItemGroup>
