@@ -74,7 +74,6 @@ namespace GalleryOfLuna.Vk
 
             switch (dbConfiguration.Type)
             {
-                case DatabaseTypes.Default:
                 case DatabaseTypes.PostgreSQL:
                     services.AddDbContextPool<PublishingDbContext, PostgreSqlPublishingDbContext>(
                         dbConfiguration.ConnectionString,
@@ -82,6 +81,7 @@ namespace GalleryOfLuna.Vk
                         dbConfiguration.MaximumConnections);
                 break;
 
+                case DatabaseTypes.Default:
                 case DatabaseTypes.SQLite:
                     services.AddDbContextPool<PublishingDbContext, SqlitePublishingDbContext>(
                         dbConfiguration.ConnectionString,

@@ -289,9 +289,9 @@ namespace GalleryOfLuna.Vk
                 throw new Exception($"Error code {error.Error.ErrorCode} - {error.Error.ErrorMsg}");
             }
 
-            var result = jsonDocument.Deserialize<T>(_jsonSerializerOptions);
+            var result = jsonDocument.Deserialize<T>(_jsonSerializerOptions)
+                         ?? throw new Exception($"Can't deserialize {typeof(T).Name} response of VK API");
 
-            Debug.Assert(content != null, "VK API returns null response");
             return result;
         }
     }

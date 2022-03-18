@@ -16,7 +16,7 @@ namespace GalleryOfLuna.Vk
 
         private readonly PriorityQueue<Target, DateTime> _queue = new();
         private readonly SemaphoreSlim _queueMutex = new(1);
-        private ActionBlock<JobInformation> _processing;
+        private ActionBlock<JobInformation>? _processing;
 
         public Scheduler(
             HealthCheckService healthCheckService,

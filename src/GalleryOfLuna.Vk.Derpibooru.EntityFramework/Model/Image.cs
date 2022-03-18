@@ -13,6 +13,7 @@ namespace GalleryOfLuna.Vk.Derpibooru.EntityFramework.Model
             Galleries = new HashSet<Gallery>();
             SourceChanges = new HashSet<SourceChange>();
             TagChanges = new HashSet<TagChange>();
+            ImageTaggings = new HashSet<ImageTagging>();
         }
 
         public long Id { get; set; }
