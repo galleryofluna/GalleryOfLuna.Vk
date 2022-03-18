@@ -3,6 +3,8 @@ using GalleryOfLuna.Vk.Derpibooru.EntityFramework;
 using GalleryOfLuna.Vk.Derpibooru.EntityFramework.Model;
 using GalleryOfLuna.Vk.Publishing.EntityFramework;
 using GalleryOfLuna.Vk.Publishing.EntityFramework.Model;
+using GalleryOfLuna.Vk.Responses.Photos;
+using GalleryOfLuna.Vk.Responses.Video;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -47,9 +49,9 @@ namespace GalleryOfLuna.Vk
 
             var image = await FindImageAsync(cancellationToken);
 
-            await using var imageStream = await OpenStreamAsync(image);
+            var imageContent = await GetImageContentAsync(image);
 
-            await PublishImageAsync(image, imageStream, cancellationToken);
+            await PublishImageAsync(image, imageContent, cancellationToken);
 
             await MarkImageAsPublished(image, cancellationToken);
 
@@ -78,9 +80,10 @@ namespace GalleryOfLuna.Vk
                 .OrderByDescending(d => d.WilsonScore)
                 .Where(image => !publishedIds.Contains(image.Id))
                 .Where(image => image.Score > _target.Threshold)
-                // TODO: Support animated formats
-                .Where(image => image.ImageFormat != "webm")
-                .Where(image => image.ImageFormat != "gif");
+                // Exclude hidden images (DoNotPost, banned or regulatory compliance)
+                .Where(image => !_derpibooru.ImageHides.Select(hide => hide.ImageId).Contains(image.Id))
+                // Exclude duplicated posts
+                .Where(image => !_derpibooru.ImageDuplicates.Select(x => x.ImageId).Contains(image.Id));
 
             if (_target.Until.HasValue)
                 query = query.Where(image => image.CreatedAt < _target.Until.Value);
@@ -105,7 +108,7 @@ namespace GalleryOfLuna.Vk
             return image;
         }
 
-        private async Task<Stream> OpenStreamAsync(Image image, CancellationToken cancellationToken = default)
+        private async Task<byte[]> GetImageContentAsync(Image image, CancellationToken cancellationToken = default)
         {
             const string derpiCdnBaseUrl = "https://derpicdn.net/img/";
             var d = image.CreatedAt;
@@ -118,23 +121,84 @@ namespace GalleryOfLuna.Vk
 
             var requestUri = requestUriBuilder.ToString();
 
-            return await _httpClient.GetStreamAsync(requestUri, cancellationToken);
+            return await _httpClient.GetByteArrayAsync(requestUri, cancellationToken);
         }
 
         private async Task PublishImageAsync(
             Image image,
-            Stream imageStream,
+            byte[] imageContent,
+            CancellationToken cancellationToken = default)
+        {
+            var groupId = _vkConfiguration.GroupId;
+            var attachments = string.Empty;
+            var imageFormat = GetImageFormat(image);
+            switch (imageFormat)
+            {
+                case "webm":
+                    var uploadedVideo = await UploadVideoAsync(image, imageContent, cancellationToken);
+                    attachments = $"video{-groupId}_{uploadedVideo.VideoId}";
+                    break;
+
+                case "gif":
+                    var uploadedGif = await UploadGifAsync(image, imageContent, cancellationToken);
+                    attachments = $"doc{uploadedGif.Doc.OwnerId}_{uploadedGif.Doc.Id}";
+                    break;
+
+                default:
+                    var savedPhoto = await UploadImageAsync(image, imageContent, cancellationToken);
+                    attachments = $"photo{savedPhoto.OwnerId}_{savedPhoto.Id}";
+                    break;
+            }
+
+            var message = GetMessage(image);
+            var copyright = await GetCopyright(image);
+
+            await _vkClient.Post(
+                -groupId,
+                message,
+                attachments,
+                copyright,
+                cancellationToken);
+        }
+
+        private async Task<Responses.Docs.SaveResponse> UploadGifAsync(
+            Image image,
+            byte[] imageContent,
+            CancellationToken cancellationToken = default)
+        {
+            var uploadServerInfo = await _vkClient.DocsGetUploadServerAsync(cancellationToken);
+
+            var uploadedDocResponse = await _vkClient.UploadDocumnetAsync(
+                uploadServerInfo.UploadUrl,
+                GetImageFormat(image),
+                imageContent,
+                cancellationToken);
+
+            var savedDocument = await _vkClient.DocsSave(uploadedDocResponse.File,
+                $"{image.Id}.{image.ImageFormat}",
+                string.Empty,
+                false,
+                cancellationToken);
+
+            await _vkClient.DocsDelete(savedDocument.Doc.OwnerId, savedDocument.Doc.Id, cancellationToken);
+
+            return savedDocument;
+        }
+
+        private async Task<PhotoResponse> UploadImageAsync(
+            Image image,
+            byte[] imageContent,
             CancellationToken cancellationToken = default)
         {
             var uploadServerInfo =
-                await _vkClient.GetWallUploadServerAsync(
+                await _vkClient.PhotosGetWallUploadServerAsync(
                     _vkConfiguration.GroupId,
                     cancellationToken);
 
             var (server, photo, hash) = await _vkClient.UploadPhotoAsync(
                 uploadServerInfo.UploadUrl,
                 GetImageFormat(image),
-                imageStream,
+                imageContent,
                 cancellationToken);
 
             var savedPhotos = await _vkClient.SaveWallPhotoAsync(
@@ -146,16 +210,29 @@ namespace GalleryOfLuna.Vk
 
             var savedPhoto = savedPhotos.First();
 
-            var message = GetMessage(image);
-            var copyright = await GetCopyright(image);
-            var attachments = $"photo{savedPhoto.OwnerId}_{savedPhoto.Id}";
+            return savedPhoto;
+        }
 
-            await _vkClient.Post(
-                -_vkConfiguration.GroupId,
-                message,
-                attachments,
-                copyright,
+        private async Task<UploadVideoResponse> UploadVideoAsync(
+            Image image,
+            byte[] videoContent,
+            CancellationToken cancellationToken = default)
+        {
+            var uploadServerInfo = await _vkClient.VideoSave(
+                $"{image.Id}.{image.ImageFormat}",
+                await GetCopyright(image),
+                _vkConfiguration.GroupId,
+                true,
+                true,
                 cancellationToken);
+
+            var uploadVideoResponse = await _vkClient.UploadVideoAsync(
+                uploadServerInfo.UploadUrl,
+                GetImageFormat(image),
+                videoContent,
+                cancellationToken);
+
+            return uploadVideoResponse;
         }
 
         private async Task<PublishedImage> MarkImageAsPublished(

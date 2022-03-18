@@ -1,6 +1,6 @@
 ﻿using GalleryOfLuna.Vk.Configuration;
 using GalleryOfLuna.Vk.Responses;
-using GalleryOfLuna.Vk.Responses.Photos;
+using GalleryOfLuna.Vk.Responses.Video;
 
 using Microsoft.Extensions.Options;
 
@@ -43,7 +43,25 @@ namespace GalleryOfLuna.Vk
             _jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }
 
-        public async Task<GetWallUploadServerResponse> GetWallUploadServerAsync(
+
+        public async Task<Responses.Docs.GetUploadServerResponse> DocsGetUploadServerAsync(
+            CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new QueryBuilder()
+                .Add(QueryParameters.AccessToken, _configuration.AccessToken)
+                .Add(QueryParameters.Version, ApiVersion);
+
+            var requestUriBuilder = new UriBuilder(_httpClient.BaseAddress!);
+            requestUriBuilder.Path = "/method/docs.getUploadServer";
+            requestUriBuilder.Query = queryBuilder.ToString();
+
+            return await SendRequestAsync<VkResponse<Responses.Docs.GetUploadServerResponse>>(
+                requestUriBuilder.ToString(),
+                HttpMethod.Get,
+                cancellationToken);
+        }
+
+        public async Task<Responses.Photos.GetWallUploadServerResponse> PhotosGetWallUploadServerAsync(
             long groupId,
             CancellationToken cancellationToken = default)
         {
@@ -56,13 +74,13 @@ namespace GalleryOfLuna.Vk
             requestUriBuilder.Path = "/method/photos.getWallUploadServer";
             requestUriBuilder.Query = queryBuilder.ToString();
 
-            return await SendRequestAsync<VkResponse<GetWallUploadServerResponse>>(
+            return await SendRequestAsync<VkResponse<Responses.Photos.GetWallUploadServerResponse>>(
                 requestUriBuilder.ToString(),
                 HttpMethod.Get,
                 cancellationToken);
         }
 
-        public async Task<IEnumerable<PhotoResponse>> SaveWallPhotoAsync(
+        public async Task<IEnumerable<Responses.Photos.PhotoResponse>> SaveWallPhotoAsync(
             long groupId,
             string photo,
             long server,
@@ -81,7 +99,7 @@ namespace GalleryOfLuna.Vk
             requestUriBuilder.Path = "/method/photos.saveWallPhoto";
             requestUriBuilder.Query = queryBuilder.ToString();
 
-            var result = await SendRequestAsync<VkResponse<IEnumerable<PhotoResponse>>>(
+            var result = await SendRequestAsync<VkResponse<IEnumerable<Responses.Photos.PhotoResponse>>>(
                 requestUriBuilder.ToString(),
                 HttpMethod.Get,
                 cancellationToken);
@@ -98,9 +116,9 @@ namespace GalleryOfLuna.Vk
         {
             var queryBuilder = new QueryBuilder()
                 .Add(QueryParameters.AccessToken, _configuration.AccessToken)
+                .Add(QueryParameters.Version, ApiVersion)
                 .Add(QueryParameters.Message, message)
                 .Add(QueryParameters.Copyright, copyright)
-                .Add(QueryParameters.Version, ApiVersion)
                 .Add(QueryParameters.OwnerId, ownerId)
                 .Add(QueryParameters.Attachments, attachments);
 
@@ -115,28 +133,123 @@ namespace GalleryOfLuna.Vk
                 cancellationToken);
         }
 
-        public async Task<UploadPhotoResponse> UploadPhotoAsync(
+        public async Task<Responses.Docs.SaveResponse> DocsSave(
+            string file,
+            string title,
+            string tags,
+            bool returnTags,
+            CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new QueryBuilder()
+                .Add(QueryParameters.AccessToken, _configuration.AccessToken)
+                .Add(QueryParameters.Version, ApiVersion)
+                .Add(QueryParameters.File, file)
+                .Add(QueryParameters.Title, title)
+                .Add(QueryParameters.Tags, tags)
+                .Add(QueryParameters.ReturnTags, returnTags);
+
+            var requestUriBuilder = new UriBuilder(_httpClient.BaseAddress!);
+            requestUriBuilder.Path = "/method/docs.save";
+            requestUriBuilder.Query = queryBuilder.ToString();
+
+            return await SendRequestAsync<VkResponse<Responses.Docs.SaveResponse>>(
+                requestUriBuilder.ToString(),
+                HttpMethod.Get,
+                cancellationToken);
+        }
+
+        public async Task DocsDelete(
+            long ownerId,
+            long docId,
+            CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new QueryBuilder()
+                .Add(QueryParameters.AccessToken, _configuration.AccessToken)
+                .Add(QueryParameters.Version, ApiVersion)
+                .Add(QueryParameters.OwnerId, ownerId)
+                .Add(QueryParameters.DocId, docId);
+
+            var requestUriBuilder = new UriBuilder(_httpClient.BaseAddress!);
+            requestUriBuilder.Path = "/method/docs.delete";
+            requestUriBuilder.Query = queryBuilder.ToString();
+
+            await SendRequestAsync<object>(
+                requestUriBuilder.ToString(),
+                HttpMethod.Get,
+                cancellationToken);
+        }
+
+        public async Task<Responses.Video.SaveResponse> VideoSave(
+            string name,
+            string description,
+            long groupId,
+            bool noComments,
+            bool repeat,
+            CancellationToken cancellationToken = default)
+        {
+            var queryBuilder = new QueryBuilder()
+                .Add(QueryParameters.AccessToken, _configuration.AccessToken)
+                .Add(QueryParameters.Version, ApiVersion)
+                .Add(QueryParameters.Name, name)
+                .Add(QueryParameters.Description, description)
+                .Add(QueryParameters.GroupId, groupId)
+                .Add(QueryParameters.NoComments, ApiVersion)
+                .Add(QueryParameters.Repeat, repeat);
+
+            var requestUriBuilder = new UriBuilder(_httpClient.BaseAddress!);
+            requestUriBuilder.Path = "/method/video.save";
+            requestUriBuilder.Query = queryBuilder.ToString();
+
+            return await SendRequestAsync<VkResponse<Responses.Video.SaveResponse>>(
+                requestUriBuilder.ToString(),
+                HttpMethod.Get,
+                cancellationToken);
+        }
+
+        public async Task<UploadVideoResponse> UploadVideoAsync(
+            string uploadUrl,
+            string videoFormat,
+            byte[] fileContent,
+            CancellationToken cancellationToken = default)
+        {
+            var content = GetUploadContent("video_file", videoFormat, fileContent);
+
+            return await SendRequestAsync<UploadVideoResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
+        }
+
+        public async Task<Responses.Photos.UploadPhotoResponse> UploadPhotoAsync(
             string uploadUrl,
             string imageFormat,
-            Stream fileStream,
+            byte[] fileStream,
             CancellationToken cancellationToken = default)
         {
             var content = GetUploadContent("photo", imageFormat, fileStream);
 
-            return await SendRequestAsync<UploadPhotoResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
+            return await SendRequestAsync<Responses.Photos.UploadPhotoResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
+        }
+
+        public async Task<Responses.Photos.UploadDocumentResponse> UploadDocumnetAsync(
+            string uploadUrl,
+            string imageFormat,
+            byte[] fileStream,
+            CancellationToken cancellationToken = default)
+        {
+            var content = GetUploadContent("file", imageFormat, fileStream);
+
+            return await SendRequestAsync<Responses.Photos.UploadDocumentResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
         }
 
         private MultipartFormDataContent GetUploadContent(
             string fieldName,
             string imageFormat,
-            params Stream[] fileStreams)
+            params byte[][] files)
         {
             var formData = new MultipartFormDataContent();
-            for (var i = 1; i <= fileStreams.Length; i++)
+            for (var i = 1; i <= files.Length; i++)
             {
-                var fileStream = fileStreams[i - 1];
-                var fileContent = new StreamContent(fileStream);
-                var fileName = fileStreams.Length > 1 ? $"{fieldName}{i}" : fieldName;
+                var payload = files[i - 1];
+                var fileContent = new ByteArrayContent(payload);
+                var fileName = files.Length > 1 ? $"{fieldName}{i}" : fieldName;
                 fileContent.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
                 formData.Add(fileContent, fileName, $"{fileName}.{imageFormat}");
             }
@@ -161,9 +274,8 @@ namespace GalleryOfLuna.Vk
             request.Content = httpContent;
 
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            response.EnsureSuccessStatusCode();
-
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            response.EnsureSuccessStatusCode();
             var jsonDocument = JsonDocument.Parse(content);
 
             // [2022-03-12 00:26:50] [System.Net.Http.HttpClient.Default.LogicalHandler] [Information] End processing HTTP request after 33.5608ms - 200
