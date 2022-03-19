@@ -1,22 +1,36 @@
-version: '3.4'
+version: '3.9'
 
 services:
   service:
     image: galleryofluna-vk
     depends_on: 
-      - derpibooru
+      - database
     build:
-      context: ./src/GalleryOfLuna.Vk
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./src/GalleryOfLuna.Vk/Dockerfile
+    volumes:
+      - type: bind
+        source: /opt/galleryofluna/vk/appsettings.json
+        target: /app/appsettings.Production.json
+        read_only: true
+      - type: bind
+        source: /opt/galleryofluna/vk/GalleryOfLuna.Publishing.db
+        target: /app/GalleryOfLuna.Publishing.db
     env_file: 
       - .env
     environment:
-      - Derpibooru__ConnectionString=Server=derpibooru;Database=derpibooru;User Id=postgres;Password=${POSTGRES_PASSWORD};
+      - Derpibooru__ConnectionString=Server=database;Database=derpibooru;User Id=postgres;Password=${POSTGRES_PASSWORD};
+      - Database__ConnectionString=Data Source=GalleryOfLuna.Publishing.db;
 
-  derpibooru:
+  database:
     image: pg-derpibooru-dump
     build:
       context: ./tools/pg-derpibooru-dump
       dockerfile: Dockerfile
+    volumes:
+      - pg-data:/var/lib/postgresql/data
     env_file: 
       - .env
+
+volumes:
+  pg-data:

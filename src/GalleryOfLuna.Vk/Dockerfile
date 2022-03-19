@@ -5,14 +5,13 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["GalleryOfLuna.Vk.csproj", "./"]
-RUN dotnet restore "GalleryOfLuna.Vk.csproj"
-COPY . .
+COPY . . 
+RUN dotnet restore "src/GalleryOfLuna.Vk/GalleryOfLuna.Vk.csproj"
 WORKDIR "/src"
-RUN dotnet build "GalleryOfLuna.Vk.csproj" -c Release -o /app/build
+RUN dotnet build "src/GalleryOfLuna.Vk/GalleryOfLuna.Vk.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "GalleryOfLuna.Vk.csproj" -c Release -o /app/publish
+RUN dotnet publish "src/GalleryOfLuna.Vk/GalleryOfLuna.Vk.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
