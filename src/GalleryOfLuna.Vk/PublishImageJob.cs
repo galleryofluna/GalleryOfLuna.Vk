@@ -259,11 +259,31 @@ namespace GalleryOfLuna.Vk
         }
 
         private string GetMessage(Image image) => 
-@$"Автор {image.User?.Name ?? "Background Pony"}
+@$"{GetAuthors(image)}
 
 Рейтинг: {image.Score}
 Добавили в избранное: {image.Favorites}
 #Derpibooru #GalleryOfLuna";
+
+        private string GetAuthors(Image image)
+        {
+            var authors = image.ImageTaggings
+                .Select(x => x.Tag)
+                .Where(x => x.Name.StartsWith("artist:"))
+                .Select(x => x.Name.Replace("artist:", string.Empty))
+                .ToArray();
+
+            if (authors.Any())
+            {
+                if (authors.Count() == 1)
+                    return $"Автор {authors.First()}";
+                return $"Авторы {string.Join(", ", authors)}";
+            }
+
+            return image.User?.Name != null
+                ? $"Загрузил {image.User?.Name}"
+                : "Загрузил Background Pony";
+        }
 
         private async Task<string> GetCopyright(Image image)
         {
