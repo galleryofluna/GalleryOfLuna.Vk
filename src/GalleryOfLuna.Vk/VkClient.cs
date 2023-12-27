@@ -228,7 +228,7 @@ namespace GalleryOfLuna.Vk
             return await SendRequestAsync<Responses.Photos.UploadPhotoResponse>(uploadUrl, HttpMethod.Post, content, cancellationToken);
         }
 
-        public async Task<Responses.Photos.UploadDocumentResponse> UploadDocumnetAsync(
+        public async Task<Responses.Photos.UploadDocumentResponse> UploadDocumentAsync(
             string uploadUrl,
             string imageFormat,
             byte[] fileStream,

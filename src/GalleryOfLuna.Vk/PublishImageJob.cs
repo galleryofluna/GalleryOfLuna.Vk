@@ -48,14 +48,21 @@ namespace GalleryOfLuna.Vk
                 cancellationToken);
 
             var image = await FindImageAsync(cancellationToken);
+            _logger.LogInformation("Found image with identifier '{id}'", image.Id);
 
-            var imageContent = await GetImageContentAsync(image);
-
-            await PublishImageAsync(image, imageContent, cancellationToken);
-
-            await MarkImageAsPublished(image, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
+            var isPublished = false;
+            try
+            {
+                var imageContent = await GetImageContentAsync(image);
+                await PublishImageAsync(image, imageContent, cancellationToken);
+                _logger.LogInformation("Image with identifier '{id}' has been published", image.Id);
+                isPublished = true;
+            }
+            finally
+            {
+                await MarkImageAsPublished(image, isPublished, cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }
         }
 
         private async Task<Image> FindImageAsync(CancellationToken cancellationToken = default)
@@ -168,7 +175,7 @@ namespace GalleryOfLuna.Vk
         {
             var uploadServerInfo = await _vkClient.DocsGetUploadServerAsync(cancellationToken);
 
-            var uploadedDocResponse = await _vkClient.UploadDocumnetAsync(
+            var uploadedDocResponse = await _vkClient.UploadDocumentAsync(
                 uploadServerInfo.UploadUrl,
                 GetImageFormat(image),
                 imageContent,
@@ -237,9 +244,12 @@ namespace GalleryOfLuna.Vk
 
         private async Task<PublishedImage> MarkImageAsPublished(
             Image image,
+            bool isPublished = true,
             CancellationToken cancellationToken = default)
         {
-            var publishedImage = new PublishedImage(DateTime.UtcNow, "Derpibooru", image.Id.ToString());
+            var publishedImage = isPublished
+                ? new PublishedImage("Derpibooru", image.Id.ToString())
+                : new PublishedImage(DateTime.UtcNow, "Derpibooru", image.Id.ToString());
             _publishingDbContext.PublishedImages.Add(publishedImage);
             await _publishingDbContext.SaveChangesAsync(cancellationToken);
 
