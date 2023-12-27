@@ -31,8 +31,11 @@ namespace GalleryOfLuna.Vk.Publishing.EntityFramework.Sqlite.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("PublishedOn")
+                    b.Property<DateTime?>("PublishedOn")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Skipped")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
