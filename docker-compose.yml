@@ -3,6 +3,8 @@ version: '3.9'
 services:
   service:
     image: galleryofluna-vk
+    container_name: gof-service
+    restart: always
     depends_on: 
       - database
     build:
@@ -10,11 +12,11 @@ services:
       dockerfile: ./src/GalleryOfLuna.Vk/Dockerfile
     volumes:
       - type: bind
-        source: /opt/galleryofluna/vk/appsettings.json
+        source: /var/opt/galleryofluna/vk/appsettings.json
         target: /app/appsettings.Production.json
         read_only: true
       - type: bind
-        source: /opt/galleryofluna/vk/GalleryOfLuna.Publishing.db
+        source: /var/opt/galleryofluna/vk/GalleryOfLuna.Publishing.db
         target: /app/GalleryOfLuna.Publishing.db
     env_file: 
       - .env
@@ -24,6 +26,8 @@ services:
 
   database:
     image: pg-derpibooru-dump
+    container_name: gof-postgres
+    restart: always
     build:
       context: ./tools/pg-derpibooru-dump
       dockerfile: Dockerfile
